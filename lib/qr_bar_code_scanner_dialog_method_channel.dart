@@ -86,25 +86,23 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      //mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(10),
             child: _buildQrView(context),
           ),
         ),
-        const SizedBox(height: 8),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text("Stop"),
+            child: const Text("Close"),
           ),
         ),
-        const SizedBox(height: 8),
       ],
     );
   }
