@@ -94,12 +94,14 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             child: _buildQrView(context),
           ),
         ),
+        const SizedBox(height: 8),
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: const Text("Stop"),
         ),
+        const SizedBox(height: 8),
       ],
     );
   }
