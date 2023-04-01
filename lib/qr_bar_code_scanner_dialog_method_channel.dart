@@ -90,16 +90,19 @@ class _ScannerWidgetState extends State<ScannerWidget> {
       children: [
         Flexible(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(20),
             child: _buildQrView(context),
           ),
         ),
         const SizedBox(height: 8),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text("Stop"),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Stop"),
+          ),
         ),
         const SizedBox(height: 8),
       ],
