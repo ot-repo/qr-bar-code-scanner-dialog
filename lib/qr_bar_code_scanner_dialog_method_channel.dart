@@ -28,26 +28,29 @@ class MethodChannelQrBarCodeScannerDialog
     assert(context != null);
 
     showDialog(
-        context: context!,
-        builder: (context) => Container(
-              alignment: Alignment.center,
-              child: Container(
-                height: 400,
-                width: 600,
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ScannerWidget(onScanSuccess: (code) {
-                  if (code != null) {
-                    Navigator.pop(context);
-                    onScanSuccess(code);
-                  }
-                }),
-              ),
-            ));
+      context: context!,
+      builder: (context) => Container(
+        alignment: Alignment.center,
+        child: Container(
+          height: 400,
+          width: 600,
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ScannerWidget(
+            onScanSuccess: (code) {
+              if (code != null) {
+                Navigator.pop(context);
+                onScanSuccess(code);
+              }
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -65,6 +68,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   GlobalKey qrKey = GlobalKey(debugLabel: 'scanner');
 
   bool isScanned = false;
+  bool isFlashOn = false;
 
   @override
   void reassemble() {
@@ -91,7 +95,37 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         Flexible(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: _buildQrView(context),
+            child: Stack(
+              children: [
+                _buildQrView(context),
+                Positioned(
+                  bottom: 5,
+                  right: 5,
+                  child: CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.secondaryContainer,
+                    child: IconButton(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      onPressed: () async {
+                        if (controller != null) {
+                          await controller?.toggleFlash();
+                          isFlashOn =
+                              (await controller?.getFlashStatus()) ?? false;
+                          setState(() {
+                            debugPrint("isFlashOn: $isFlashOn");
+                          });
+                        }
+                      },
+                      icon: Icon(
+                        isFlashOn
+                            ? Icons.flashlight_on_outlined
+                            : Icons.flashlight_off_rounded,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         Padding(
@@ -115,20 +149,23 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
     return QRView(
       key: qrKey,
+      cameraFacing: CameraFacing.back,
       onQRViewCreated: (controller) {
         _onQRViewCreated(controller);
       },
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.black,
-          borderRadius: 10,
-          borderLength: 30,
-          borderWidth: 10,
-          cutOutSize: smallestDimension - 140),
+        borderColor: Colors.black,
+        borderRadius: 10,
+        borderLength: 30,
+        borderWidth: 10,
+        cutOutSize: smallestDimension - 140,
+      ),
     );
   }
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
+
     controller.scannedDataStream.listen((Barcode scanData) async {
       if (!isScanned) {
         isScanned = true;
