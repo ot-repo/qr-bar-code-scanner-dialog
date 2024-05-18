@@ -13,9 +13,9 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   plugin_platform_interface: ^2.1.2
-  qr_code_scanner:
-    git:
-      url: https://github.com/disparta/qr_code_scanner.git
+  qr_code_scanner: ^1.0.1
+  #  git:
+  #    url: https://github.com/disparta/qr_code_scanner.git
 
 dev_dependencies:
   flutter_test:
