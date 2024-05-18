@@ -69,6 +69,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   bool isScanned = false;
   bool isFlashOn = false;
+  bool hasFlash = false;
 
   @override
   void reassemble() {
@@ -98,7 +99,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             child: Stack(
               children: [
                 _buildQrView(context),
-                Positioned(
+               if (hasFlash) Positioned(
                   bottom: 5,
                   right: 5,
                   child: CircleAvatar(
@@ -163,14 +164,20 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(QRViewController controller) async {
     this.controller = controller;
+
+    var result = await controller.getSystemFeatures();
+
 
     controller.scannedDataStream.listen((Barcode scanData) async {
       if (!isScanned) {
         isScanned = true;
         widget.onScanSuccess(scanData.code);
       }
+    });
+    setState(() {
+      hasFlash = result.hasFlash;
     });
   }
 }
