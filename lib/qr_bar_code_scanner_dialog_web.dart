@@ -2,14 +2,21 @@
 // of your plugin as a separate package, instead of inlining it in the same
 // package as the core of your plugin.
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html
-    show window, Element, ScriptElement, StyleElement, querySelector, Text;
+// import 'dart:html' as html
+//     show window, Element, ScriptElement, StyleElement, querySelector, Text;
+
+import 'dart:js_interop';
+import 'dart:js_util' as js_util;
+
+import 'package:web/web.dart' as web;
+// show window, Element, HTMLScriptElement, HTMLStyleElement, Text;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
-import 'qr_bar_code_scanner_dialog_platform_interface.dart';
-import 'dart:js' as js;
+// import 'dart:js' as js;
+
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog_platform_interface.dart';
 
 const String _kQrBarCodeScannerModelDomId = '__qr_bar_code_scanner_web-model';
 
@@ -25,39 +32,40 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
   }
 
   /// Initializes a DOM container where we can host input elements.
-  html.Element _ensureInitialized(String id) {
-    var target = html.querySelector('#$id');
+  web.Element _ensureInitialized(String id) {
+    var target = web.document.querySelector('#$id');
     if (target == null) {
-      final html.Element targetElement = html.Element.div()
+      final web.Element targetElement = web.HTMLDivElement()
         ..id = id
         ..className = "modal";
 
-      final html.Element content = html.Element.div()
+      final web.Element content = web.HTMLDivElement()
         ..className = "modal-content";
 
-      final html.Element div = html.Element.div()
+      final web.Element div = web.HTMLDivElement()
         ..setAttribute("style", "container");
 
-      final html.Element reader = html.Element.div()
+      final web.Element reader = web.HTMLDivElement()
         ..id = "qr-reader"
         ..setAttribute("width", "400px");
-      div.children.add(reader);
+      div.appendChild(reader);
 
-      content.children.add(div);
-      targetElement.children.add(content);
+      content.appendChild(div);
+      targetElement.appendChild(content);
 
-      final body = html.querySelector('body')!;
+      final body = web.document.querySelector('body')!;
 
-      body.children.add(targetElement);
+      body.appendChild(targetElement);
 
-      final script = html.ScriptElement()
+      final script = web.HTMLScriptElement()
         ..src = "https://unpkg.com/html5-qrcode";
-      body.children.add(script);
+      body.appendChild(script);
 
-      final head = html.querySelector('head')!;
-      final style = html.StyleElement();
+      final head = web.document.querySelector('head')!;
 
-      final styleContent = html.Text("""
+      final style = web.HTMLStyleElement();
+
+      final styleContent = web.Text("""
         
         /* The Modal (background) */
         .modal {
@@ -102,8 +110,8 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
       
       """);
 
-      final codeScript = html.ScriptElement();
-      final scriptText = html.Text(r"""
+      final codeScript = web.HTMLScriptElement();
+      final scriptText = web.Text(r"""
         
         var html5QrcodeScanner;
 
@@ -135,12 +143,18 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
         }
         
       """);
-      codeScript.nodes.add(scriptText);
+      codeScript.appendChild(scriptText);
+      // codeScript.childNodes.add(scriptText);
+      // codeScript.nodes.add(scriptText);
 
-      style.nodes.add(styleContent);
-      head.children.add(style);
-      head.children.add(codeScript);
+      // style.childNodes.add(styleContent);
+      style.appendChild(styleContent);
 
+      // style.nodes.add(styleContent);
+      // head.children.add(style);
+      head.appendChild(style);
+      // head.children.add(codeScript);
+      head.appendChild(codeScript);
       target = targetElement;
     }
     return target;
@@ -149,13 +163,14 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
   /// Returns a [String] containing the version of the platform.
   @override
   Future<String?> getPlatformVersion() async {
-    final version = html.window.navigator.userAgent;
+    final version = web.window.navigator.userAgent;
     return version;
   }
 
   @override
   void scanBarOrQrCode(
       {BuildContext? context, required Function(String?) onScanSuccess}) {
-    js.context.callMethod("scanCode", [onScanSuccess]);
+    js_util.callMethod(
+        js_util.globalThis, "scanCode", [js_util.allowInterop(onScanSuccess)]);
   }
 }
