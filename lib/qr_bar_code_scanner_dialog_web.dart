@@ -39,11 +39,9 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
         ..id = id
         ..className = "modal";
 
-      final web.Element content = web.HTMLDivElement()
-        ..className = "modal-content";
+      final web.Element content = web.HTMLDivElement()..className = "modal-content";
 
-      final web.Element div = web.HTMLDivElement()
-        ..setAttribute("style", "container");
+      final web.Element div = web.HTMLDivElement()..setAttribute("style", "container");
 
       final web.Element reader = web.HTMLDivElement()
         ..id = "qr-reader"
@@ -57,8 +55,7 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
 
       body.appendChild(targetElement);
 
-      final script = web.HTMLScriptElement()
-        ..src = "https://unpkg.com/html5-qrcode";
+      final script = web.HTMLScriptElement()..src = "https://unpkg.com/html5-qrcode";
       body.appendChild(script);
 
       final head = web.document.querySelector('head')!;
@@ -168,9 +165,7 @@ class QrBarCodeScannerDialogWeb extends QrBarCodeScannerDialogPlatform {
   }
 
   @override
-  void scanBarOrQrCode(
-      {BuildContext? context, required Function(String?) onScanSuccess}) {
-    js_util.callMethod(
-        js_util.globalThis, "scanCode", [js_util.allowInterop(onScanSuccess)]);
+  void scanBarOrQrCode({BuildContext? context, required Function(String?) onScanSuccess}) {
+    js_util.callMethod(js_util.globalThis, "scanCode", [js_util.allowInterop(onScanSuccess)]);
   }
 }
